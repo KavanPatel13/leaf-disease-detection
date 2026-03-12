@@ -1,65 +1,63 @@
-
-# app.py
-# Add your Flask or FastAPI app code here
-# from flask import Flask, render_template, request
-# import pickle
-# import cv2
-# import numpy as np
-# import os
-# import gdown
-
-# app = Flask(__name__)
-# MODEL_PATH = "model/knn_model.pkl"
-# MODEL_URL = "https://drive.google.com/uc?id=19eWEElmqKyZA2No5I3Y4FoUlZWs1iSwz"
-
-# os.makedirs("model", exist_ok=True)
-# os.makedirs("static/uploads", exist_ok=True)
-# if not os.path.exists(MODEL_PATH):
-#     print("Downloading model...")
-#     gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
-
-# with open(MODEL_PATH, "rb") as f:
-#     model = pickle.load(f)
-import os
+# ==============================
+# Imports
+# ==============================
+from flask import Flask, render_template, request
 import pickle
-import gdown
+import cv2
+import numpy as np
+import os
+import urllib.request
+from werkzeug.utils import secure_filename
+
+
+# ==============================
+# Flask app
+# ==============================
+app = Flask(__name__)
+
+
+# ==============================
+# Model download from HuggingFace
+# ==============================
 
 MODEL_PATH = "model/knn_model.pkl"
-MODEL_URL = "https://drive.google.com/uc?id=1nUhIEAFvdERRVQMGoghwndXIsryreO6v"
-# create model folder
+MODEL_URL = "https://huggingface.co/Kavan13/leaf-disease-model/resolve/main/knn_model.pkl"
+
+# Create folders if not exist
 os.makedirs("model", exist_ok=True)
+os.makedirs("static/uploads", exist_ok=True)
 
-# download model if missing
+# Download model only if missing
 if not os.path.exists(MODEL_PATH):
-    print("Downloading model...")
-    gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
+    print("Downloading model from HuggingFace...")
+    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
-# now load model
+
+# ==============================
+# Load model
+# ==============================
 with open(MODEL_PATH, "rb") as f:
     model = pickle.load(f)
 
 
-# model = pickle.load(open("model/knn_model.pkl","rb"))
-# with open("model/knn_model.pkl","rb") as f:
-#     model = pickle.load(f)
-
+# ==============================
+# Disease descriptions
+# ==============================
 disease_info = {
-
-"Black_rot":
-"Black rot is a fungal disease that causes dark lesions on apple leaves and fruit.",
-
-"Cedar_rust":
-"Cedar rust creates orange spots on leaves caused by fungal infection.",
-
-"Scab":
-"Apple scab causes dark scabby spots on leaves and fruit."
+    "Black_rot": "Black rot is a fungal disease that causes dark lesions on apple leaves and fruit.",
+    "Cedar_rust": "Cedar rust creates orange spots on leaves caused by fungal infection.",
+    "Scab": "Apple scab causes dark scabby spots on leaves and fruit."
 }
 
+
+# ==============================
+# Prediction function
+# ==============================
 def predict_disease(img_path):
 
     img = cv2.imread(img_path)
-    img = cv2.resize(img,(128,128))
-    img = img/255.0
+    img = cv2.resize(img, (128,128))
+    img = img / 255.0
 
     img = img.flatten().reshape(1,-1)
 
@@ -67,32 +65,42 @@ def predict_disease(img_path):
 
     return prediction[0]
 
-@app.route("/",methods=["GET","POST"])
 
+# ==============================
+# Main Route
+# ==============================
+@app.route("/", methods=["GET","POST"])
 def index():
 
-    result=""
-    description=""
-    image_path=""
+    result = ""
+    description = ""
+    image_path = ""
 
-    if request.method=="POST":
+    if request.method == "POST":
 
-        file=request.files["leaf"]
+        file = request.files["leaf"]
 
-        # image_path="static/uploads/"+file.filename
-        from werkzeug.utils import secure_filename
         filename = secure_filename(file.filename)
         image_path = os.path.join("static/uploads", filename)
         file.save(image_path)
 
-        result=predict_disease(image_path)
+        result = predict_disease(image_path)
+        description = disease_info.get(result, "Unknown disease")
 
-        description=disease_info[result]
+    return render_template(
+        "index.html",
+        result=result,
+        description=description,
+        image=image_path
+    )
 
-    return render_template("index.html",
-                           result=result,
-                           description=description,
-                           image=image_path)
 
-if __name__=="__main__":
-    app.run(debug=True)
+# ==============================
+# Local run (NOT used on Render)
+# ==============================
+# Render uses: gunicorn app:app
+# This block only runs when you start locally with:
+# python app.py
+
+# if __name__ == "__main__":
+#     app.run(debug=True)
