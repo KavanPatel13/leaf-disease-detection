@@ -1,0 +1,6 @@
+dataset/
+train/
+test/
+__pycache__/
+*.pyc
+uploads/*
