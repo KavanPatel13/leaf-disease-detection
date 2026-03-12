@@ -8,10 +8,17 @@ import numpy as np
 import os
 import gdown
 
-url = "https://drive.google.com/uc?id=19eWEElmqKyZA2No5I3Y4FoUlZWs1iSwz"
+MODEL_PATH = "model/knn_model.pkl"
+MODEL_URL = "https://drive.google.com/uc?id=19eWEElmqKyZA2No5I3Y4FoUlZWs1iSwz"
 
-if not os.path.exists("model/knn_model.pkl"):
-    gdown.download(url, "model/knn_model.pkl", quiet=False)
+os.makedirs("model", exist_ok=True)
+
+if not os.path.exists(MODEL_PATH):
+    print("Downloading model...")
+    gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
+
+with open(MODEL_PATH, "rb") as f:
+    model = pickle.load(f)
 
 app = Flask(__name__)
 os.makedirs("static/uploads", exist_ok=True)
