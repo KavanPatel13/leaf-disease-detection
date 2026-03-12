@@ -25,8 +25,7 @@ import pickle
 import gdown
 
 MODEL_PATH = "model/knn_model.pkl"
-MODEL_URL = "https://drive.google.com/drive/folders/19eWEElmqKyZA2No5I3Y4FoUlZWs1iSwz?usp=sharing"
-
+MODEL_URL = "https://drive.google.com/file/d/1nUhIEAFvdERRVQMGoghwndXIsryreO6v/view?usp=sharing"
 # create model folder
 os.makedirs("model", exist_ok=True)
 
