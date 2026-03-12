@@ -1,26 +1,43 @@
 
 # app.py
 # Add your Flask or FastAPI app code here
-from flask import Flask, render_template, request
-import pickle
-import cv2
-import numpy as np
+# from flask import Flask, render_template, request
+# import pickle
+# import cv2
+# import numpy as np
+# import os
+# import gdown
+
+# app = Flask(__name__)
+# MODEL_PATH = "model/knn_model.pkl"
+# MODEL_URL = "https://drive.google.com/uc?id=19eWEElmqKyZA2No5I3Y4FoUlZWs1iSwz"
+
+# os.makedirs("model", exist_ok=True)
+# os.makedirs("static/uploads", exist_ok=True)
+# if not os.path.exists(MODEL_PATH):
+#     print("Downloading model...")
+#     gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
+
+# with open(MODEL_PATH, "rb") as f:
+#     model = pickle.load(f)
 import os
+import pickle
 import gdown
 
-app = Flask(__name__)
 MODEL_PATH = "model/knn_model.pkl"
-MODEL_URL = "https://drive.google.com/uc?id=19eWEElmqKyZA2No5I3Y4FoUlZWs1iSwz"
+MODEL_URL = "https://drive.google.com/drive/folders/19eWEElmqKyZA2No5I3Y4FoUlZWs1iSwz?usp=sharing"
 
+# create model folder
 os.makedirs("model", exist_ok=True)
-os.makedirs("static/uploads", exist_ok=True)
+
+# download model if missing
 if not os.path.exists(MODEL_PATH):
     print("Downloading model...")
     gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
 
+# now load model
 with open(MODEL_PATH, "rb") as f:
     model = pickle.load(f)
-
 
 
 # model = pickle.load(open("model/knn_model.pkl","rb"))
