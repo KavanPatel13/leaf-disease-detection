@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 document.addEventListener('DOMContentLoaded', function() {
     
     // --- 1. Particle System (Spores/Leaves) ---
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // If you want to keep the page open, you need to handle the response via JS.
         // For now, we let the form submit naturally, but the button shows the spinner.
     });
-=======
+// =======
 document.addEventListener('DOMContentLoaded', function() {
     
     // --- 1. Particle System (Spores/Leaves) ---
@@ -226,5 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // If you want to keep the page open, you need to handle the response via JS.
         // For now, we let the form submit naturally, but the button shows the spinner.
     });
->>>>>>> 182ff0e484c0f57286eadf6ab977e7bd1b4e40d1
+
+        // For now, we let the form submit naturally, but the button shows the spinner.
+    });
 });
