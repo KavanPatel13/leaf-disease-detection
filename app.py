@@ -13,7 +13,8 @@ app = Flask(__name__)
 MODEL_DIR = Path("model")
 UPLOAD_DIR = Path("static") / "uploads"
 MODEL_PATH = MODEL_DIR / "knn_model.pkl"
-MODEL_URL = "https://huggingface.co/Kavan13/leaf-disease-model/resolve/main/knn_model.pkl"
+# MODEL_URL = "https://huggingface.co/Kavan13/leaf-disease-model/resolve/main/knn_model.pkl"
+MODEL_URL = "https://huggingface.co/Kavan13/leaf-disease-model-v2/resolve/main/knn_model.pkl"
 
 NOT_APPLE_LEAF_MESSAGE = "It is not an appropriate image. Please upload an apple leaf image."
 NO_DISEASE_MESSAGE = "No disease detected on this apple leaf."
