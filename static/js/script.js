@@ -1,232 +1,162 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const canvas = document.getElementById("bg-particles");
 
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // --- 1. Particle System (Spores/Leaves) ---
-    const canvas = document.getElementById('bg-particles');
-    const ctx = canvas.getContext('2d');
-    
-    let particles = [];
-    const colors = ['#ffaf7b', '#d76d77', '#3a1c71', '#fff3e0', '#ffffff'];
-    
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    if (canvas) {
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+        const colors = ["#22c55e", "#4ade80", "#16a34a", "#86efac", "#bbf7d0"];
 
-    class Particle {
-        constructor() {
-            this.reset();
-        }
+        const resizeCanvas = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
 
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = canvas.height + Math.random() * 100; // Start below screen
-            this.size = Math.random() * 5 + 2;
-            this.speedY = Math.random() * 1 + 0.5; // Float up
-            this.speedX = (Math.random() - 0.5) * 0.5;
-            this.color = colors[Math.floor(Math.random() * colors.length)];
-            this.opacity = Math.random() * 0.5 + 0.1;
-            this.rotation = Math.random() * 360;
-            this.rotationSpeed = (Math.random() - 0.5) * 2;
-        }
+        const drawLeaf = (x, y, size, rotation, color, opacity) => {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.globalAlpha = opacity;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(size * 0.5, -size * 0.3, size, 0, 0, size * 1.5);
+            ctx.bezierCurveTo(-size, 0, -size * 0.5, -size * 0.3, 0, 0);
+            ctx.fill();
 
-        update() {
-            this.y -= this.speedY;
-            this.x += this.speedX;
-            this.rotation += this.rotationSpeed;
+            ctx.strokeStyle = "rgba(255,255,255,0.4)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, size * 1.2);
+            ctx.stroke();
+            ctx.restore();
+        };
 
-            // Reset if it goes off top
-            if (this.y < -20) {
+        class LeafParticle {
+            constructor() {
                 this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 10 + 4;
+                this.speedY = Math.random() * 1 + 0.3;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.opacity = Math.random() * 0.5 + 0.3;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotationSpeed;
+
+                if (this.y < -50) {
+                    this.reset();
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                drawLeaf(this.x, this.y, this.size, this.rotation, this.color, this.opacity);
             }
         }
 
-        draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.rotation * Math.PI / 180);
-            ctx.globalAlpha = this.opacity;
-            
-            // Draw a simple leaf shape
-            ctx.beginPath();
-            ctx.ellipse(0, 0, this.size * 2, this.size, 0, 0, 2 * Math.PI);
-            ctx.fillStyle = this.color;
-            ctx.fill();
-            
-            ctx.restore();
-        }
-    }
+        const initParticles = () => {
+            particles = [];
 
-    function initParticles() {
-        particles = [];
-        for (let i = 0; i < 60; i++) {
-            particles.push(new Particle());
-        }
-    }
-
-    function animateParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
-        
-        requestAnimationFrame(animateParticles);
-    }
-
-    initParticles();
-    animateParticles();
-
-    // --- 2. Form Handling & Loading State ---
-    const form = document.getElementById('detectionForm');
-    const fileInput = document.getElementById('fileInput');
-    const fileNameDisplay = document.getElementById('fileName');
-    const btn = document.querySelector('.btn-animated');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-
-    // Show filename when selected
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            fileNameDisplay.textContent = `Selected: ${this.files[0].name}`;
-        }
-    });
-
-    // Handle Submit
-    form.addEventListener('submit', function(e) {
-        // Note: In a real Flask app, you might want to prevent default 
-        // and use AJAX, but for this template, we simulate the loading 
-        // before the page reloads.
-        
-        // If you are using AJAX, uncomment the lines below:
-        // e.preventDefault();
-        // btn.classList.add('loading');
-        
-        // Simulate loading delay for visual effect
-        btn.classList.add('loading');
-        
-        // If the server returns immediately, the page reloads. 
-        // If you want to keep the page open, you need to handle the response via JS.
-        // For now, we let the form submit naturally, but the button shows the spinner.
-    });
-// =======
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // --- 1. Particle System (Spores/Leaves) ---
-    const canvas = document.getElementById('bg-particles');
-    const ctx = canvas.getContext('2d');
-    
-    let particles = [];
-    const colors = ['#ffaf7b', '#d76d77', '#3a1c71', '#fff3e0', '#ffffff'];
-    
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    class Particle {
-        constructor() {
-            this.reset();
-        }
-
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = canvas.height + Math.random() * 100; // Start below screen
-            this.size = Math.random() * 5 + 2;
-            this.speedY = Math.random() * 1 + 0.5; // Float up
-            this.speedX = (Math.random() - 0.5) * 0.5;
-            this.color = colors[Math.floor(Math.random() * colors.length)];
-            this.opacity = Math.random() * 0.5 + 0.1;
-            this.rotation = Math.random() * 360;
-            this.rotationSpeed = (Math.random() - 0.5) * 2;
-        }
-
-        update() {
-            this.y -= this.speedY;
-            this.x += this.speedX;
-            this.rotation += this.rotationSpeed;
-
-            // Reset if it goes off top
-            if (this.y < -20) {
-                this.reset();
+            for (let i = 0; i < 60; i += 1) {
+                particles.push(new LeafParticle());
             }
-        }
+        };
 
-        draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.rotation * Math.PI / 180);
-            ctx.globalAlpha = this.opacity;
-            
-            // Draw a simple leaf shape
-            ctx.beginPath();
-            ctx.ellipse(0, 0, this.size * 2, this.size, 0, 0, 2 * Math.PI);
-            ctx.fillStyle = this.color;
-            ctx.fill();
-            
-            ctx.restore();
-        }
+        const animateParticles = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((particle) => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        };
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+        initParticles();
+        animateParticles();
     }
 
-    function initParticles() {
-        particles = [];
-        for (let i = 0; i < 60; i++) {
-            particles.push(new Particle());
-        }
+    const revealElements = document.querySelectorAll(".reveal");
+
+    if (revealElements.length) {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.15 }
+        );
+
+        revealElements.forEach((element) => observer.observe(element));
     }
 
-    function animateParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        particles.forEach(p => {
-            p.update();
-            p.draw();
+    const pageLinks = document.querySelectorAll("[data-page-link='true']");
+    pageLinks.forEach((link) => {
+        link.addEventListener("click", (event) => {
+            if (
+                event.defaultPrevented ||
+                event.button !== 0 ||
+                event.metaKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey
+            ) {
+                return;
+            }
+
+            const href = link.getAttribute("href");
+            if (!href || href.startsWith("#")) {
+                return;
+            }
+
+            event.preventDefault();
+            document.body.classList.add("is-leaving");
+            window.setTimeout(() => {
+                window.location.href = href;
+            }, 120);
         });
-        
-        requestAnimationFrame(animateParticles);
+    });
+
+    const form = document.getElementById("detectionForm");
+    const fileInput = document.getElementById("fileInput");
+    const fileNameDisplay = document.getElementById("fileName");
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    const submitButton = form ? form.querySelector("button[type='submit'].btn-animated") : null;
+
+    if (form && fileInput && fileNameDisplay) {
+        fileInput.addEventListener("change", function () {
+            if (this.files && this.files[0]) {
+                fileNameDisplay.textContent = `Selected: ${this.files[0].name}`;
+            } else {
+                fileNameDisplay.textContent = "";
+            }
+        });
+
+        form.addEventListener("submit", () => {
+            if (submitButton) {
+                submitButton.classList.add("loading");
+                submitButton.disabled = true;
+            }
+
+            if (loadingOverlay) {
+                loadingOverlay.classList.remove("d-none");
+            }
+        });
     }
-
-    initParticles();
-    animateParticles();
-
-    // --- 2. Form Handling & Loading State ---
-    const form = document.getElementById('detectionForm');
-    const fileInput = document.getElementById('fileInput');
-    const fileNameDisplay = document.getElementById('fileName');
-    const btn = document.querySelector('.btn-animated');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-
-    // Show filename when selected
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            fileNameDisplay.textContent = `Selected: ${this.files[0].name}`;
-        }
-    });
-
-    // Handle Submit
-    form.addEventListener('submit', function(e) {
-        // Note: In a real Flask app, you might want to prevent default 
-        // and use AJAX, but for this template, we simulate the loading 
-        // before the page reloads.
-        
-        // If you are using AJAX, uncomment the lines below:
-        // e.preventDefault();
-        // btn.classList.add('loading');
-        
-        // Simulate loading delay for visual effect
-        btn.classList.add('loading');
-        
-        // If the server returns immediately, the page reloads. 
-        // If you want to keep the page open, you need to handle the response via JS.
-        // For now, we let the form submit naturally, but the button shows the spinner.
-    });
-
-        // For now, we let the form submit naturally, but the button shows the spinner.
-    });
 });

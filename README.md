@@ -1,68 +1,39 @@
-<<<<<<< HEAD
-# Leaf Disease Detection KNN
-
-Project description goes here.
 # Leaf Disease Detection using KNN
 
-Machine Learning project that detects apple leaf diseases.
+Machine learning project that detects diseases in apple leaves.
 
-Diseases Supported
-- Black Rot
-- Cedar Rust
-- Apple Scab
+## Supported classes
+- `Black_rot`
+- `Cedar_rust`
+- `Scab`
+- `Healthy` 
+- `Not_Apple_Leaf` after you add healthy apple leaf images and retrain the model
 
-Technologies
+## Technologies
 - Python
 - Flask
 - OpenCV
 - Scikit-Learn
-- Bootstrap UI
+- Bootstrap
 
-Features
-- Upload leaf image
-- Detect disease
-- Show disease description
-- Modern UI
-- KNN Machine Learning model
-
-Run Project
-
+## Run the project
+```bash
 pip install -r requirements.txt
-
 python train_model.py
-
-=======
-# Leaf Disease Detection KNN
-
-Project description goes here.
-# Leaf Disease Detection using KNN
-
-Machine Learning project that detects apple leaf diseases.
-
-Diseases Supported
-- Black Rot
-- Cedar Rust
-- Apple Scab
-
-Technologies
-- Python
-- Flask
-- OpenCV
-- Scikit-Learn
-- Bootstrap UI
-
-Features
-- Upload leaf image
-- Detect disease
-- Show disease description
-- Modern UI
-- KNN Machine Learning model
-
-Run Project
-
-pip install -r requirements.txt
-
-python train_model.py
-
->>>>>>> 182ff0e484c0f57286eadf6ab977e7bd1b4e40d1
 python app.py
+```
+
+## Add a real healthy class
+To make "No disease" accurate, add healthy apple leaf images here:
+
+```text
+dataset/Healthy/
+```
+
+Then retrain:
+
+```bash
+python train_model.py
+```
+
+The training script now loads every dataset subfolder automatically, so any valid `Healthy` folder will be included in the new model.

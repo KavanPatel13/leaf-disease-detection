@@ -1,10 +1,11 @@
-# train_model.py
-# Add your model training code here
 import os
 import cv2
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.preprocessing import LabelEncoder
+from sklearn.svm import LinearSVC, SVC
 import pickle
 
 dataset_path = "dataset"
@@ -12,83 +13,136 @@ dataset_path = "dataset"
 data = []
 labels = []
 
-classes = ["Black_rot", "Cedar_rust", "Scab"]
+# classes = ["Black_rot", "Cedar_rust", "Scab", "Healthy"]
+classes = ["Black_rot", "Cedar_rust", "Scab", "Healthy", "Not_Apple_Leaf"]
 
 for label in classes:
-
     folder = os.path.join(dataset_path, label)
 
-    for img in os.listdir(folder):
+    if not os.path.exists(folder):
+        continue
 
+    for img in os.listdir(folder):
         path = os.path.join(folder, img)
 
-        image = cv2.imread(path)
-        image = cv2.resize(image,(128,128))
+        if os.path.splitext(img)[1].lower() not in [".jpg", ".jpeg", ".png", ".bmp", ".webp"]:
+            continue
 
-        image = image / 255.0
+        image = cv2.imread(path)
+
+        if image is None:
+            continue
+
+        # âœ… Reduced size (less memory, faster)
+        image = cv2.resize(image, (96, 96))
+
+        # âœ… Convert to float32 (IMPORTANT)
+        image = image.astype("float32") / 255.0
 
         data.append(image.flatten())
         labels.append(label)
 
-X = np.array(data)
-y = np.array(labels)
+# âœ… Force float32 array (IMPORTANT)
+X = np.array(data, dtype="float32")
+y_text = np.array(labels)
 
-X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2)
+label_encoder = LabelEncoder()
+y = label_encoder.fit_transform(y_text)
 
-knn = KNeighborsClassifier(n_neighbors=5)
+print("Classes used:", list(label_encoder.classes_))
+print("Total samples:", len(X))
 
-knn.fit(X_train,y_train)
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
 
-accuracy = knn.score(X_test,y_test)
+print("Training samples:", len(X_train))
+print("Testing samples:", len(X_test))
 
-print("Model Accuracy:",accuracy*100,"%")
+# âœ… Base model
+# knn = SVC(kernel='rbf', C=1, gamma='scale')
+# knn = LinearSVC(C=1)
+knn = KNeighborsClassifier(n_neighbors=3, weights="distance", metric="manhattan")
+knn.fit(X_train, y_train)
 
-with open("model/knn_model.pkl","wb") as f:
-    pickle.dump(knn,f)
-# train_model.py
-# Add your model training code here
-# import os
-# import cv2
-# import numpy as np
-# from sklearn.neighbors import KNeighborsClassifier
-# from sklearn.model_selection import train_test_split
-# import pickle
+# accuracy = knn.score(X_test, y_test)
+y_pred = knn.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Initial Model Accuracy:", accuracy * 100, "%")
 
-# dataset_path = "dataset"
+# âœ… Grid parameters (same as yours)
+# param_grid = {
+#     "n_neighbors": [3, 5, 7, 9],
+#     "weights": ["uniform", "distance"],
+#     "metric": ["euclidean", "manhattan"]
+# }
+# param_grid = {
+#     "C": [0.1, 1, 10],
+#     "loss": ["hinge", "squared_hinge"]
+# }
+# print("Starting GridSearch... This may take time â³")
 
-# data = []
-# labels = []
+# FIX: limited jobs (avoid memory crash)
+# grid_search = GridSearchCV(
+#     knn,
+#     param_grid,
+#     cv=5,
+#     scoring="accuracy",
+#     verbose=2,
+#     n_jobs=2   # âš ï¸ IMPORTANT (was -1)
+# )
 
-# classes = ["Black_rot", "Cedar_rust", "Scab"]
+# grid_search.fit(X_train, y_train)
 
-# for label in classes:
+# print("GridSearch Completed âœ…")
+# print("Best Parameters:", grid_search.best_params_)
+# print("Best Cross-Validation Accuracy:", grid_search.best_score_ * 100, "%")
 
-#     folder = os.path.join(dataset_path, label)
+# # âœ… Best model evaluation
+# best_knn = grid_search.best_estimator_
+# grid_pre = best_knn.predict(X_test)
 
-#     for img in os.listdir(folder):
+# print("Test Accuracy with Best Parameters:", accuracy_score(y_test, grid_pre) * 100, "%")
+# print("Confusion Matrix:\n", confusion_matrix(y_test, grid_pre))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
-#         path = os.path.join(folder, img)
+print(
+    "Classification Report:\n",
+    classification_report(
+        label_encoder.inverse_transform(y_test),
+        label_encoder.inverse_transform(y_pred),
+    ),
+)
+# print(
+#     "Classification Report:\n",
+#     classification_report(
+#         label_encoder.inverse_transform(y_test),
+#         label_encoder.inverse_transform(grid_pre),
+#     ),
+# )
 
-#         image = cv2.imread(path)
-#         image = cv2.resize(image,(128,128))
+#  Save model
+os.makedirs("model", exist_ok=True)
 
-#         image = image / 255.0
+# with open("model/knn_model.pkl", "wb") as f:
+#     pickle.dump(
+#         {
+#             "model": best_knn,
+#             "label_encoder": label_encoder,
+#         },
+#         f,
+#     )
+with open("model/knn_model.pkl", "wb") as f:
+    pickle.dump(
+        {
+            "model": knn,
+            "label_encoder": label_encoder,
+        },
+        f,
+    )
 
-#         data.append(image.flatten())
-#         labels.append(label)
-
-# X = np.array(data)
-# y = np.array(labels)
-
-# X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2)
-
-# knn = KNeighborsClassifier(n_neighbors=5)
-
-# knn.fit(X_train,y_train)
-
-# accuracy = knn.score(X_test,y_test)
-
-# # print("Model Accuracy:",accuracy*100,"%")
-
-#     with open("model/knn_model.pkl","wb") as f:
-#         pickle.dump(knn,f)
+print("Model saved successfully!")

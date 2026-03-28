@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About | Leaflence</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="site-body about-page">
+<canvas id="bg-particles"></canvas>
+
+<nav class="navbar navbar-expand-lg fixed-top site-navbar">
+<div class="container">
+<a class="navbar-brand brand-mark" href="{{ url_for('home') }}" data-page-link="true">
+<i class="fas fa-leaf"></i> Leaflence
+</a>
+<button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#siteNavbar" aria-controls="siteNavbar" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="siteNavbar">
+<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+<li class="nav-item"><a class="nav-link {% if active_page == 'home' %}active{% endif %}" href="{{ url_for('home') }}" data-page-link="true">Home</a></li>
+<li class="nav-item"><a class="nav-link {% if active_page == 'predict' %}active{% endif %}" href="{{ url_for('predict_page') }}" data-page-link="true">Predict</a></li>
+<li class="nav-item"><a class="nav-link {% if active_page == 'about' %}active{% endif %}" href="{{ url_for('about') }}" data-page-link="true">About</a></li>
+</ul>
+</div>
+</div>
+</nav>
+
+<main class="page-shell">
+<section class="container hero-shell about-hero">
+<div class="glass-card section-card reveal">
+<span class="section-label">Project Overview</span>
+<h1 class="hero-title about-title">About Leaflence</h1>
+<p class="hero-text mb-0">
+Leaflence is a Flask-based leaf disease detection system that classifies apple leaf diseases using image classification with KNN, helping turn visual symptoms into quick machine learning predictions.
+</p>
+</div>
+</section>
+
+<section class="container section-block">
+<div class="row g-4">
+<div class="col-lg-6">
+<div class="section-card reveal h-100">
+<span class="section-label">Project Description</span>
+<h2>Apple leaf disease classification with KNN</h2>
+<p class="section-text">
+The project focuses on detecting apple leaf diseases from images using a machine learning pipeline. Users upload a leaf image, the system processes it, and the trained classifier predicts the likely disease category.
+</p>
+</div>
+</div>
+<div class="col-lg-6">
+<div class="section-card reveal h-100">
+<span class="section-label">Problem</span>
+<h2>Why this system matters</h2>
+<ul class="info-list">
+<li>Manual inspection is slow and can be inconsistent across large numbers of plants.</li>
+<li>Visual disease symptoms may be subtle, making early detection difficult.</li>
+<li>Machine learning provides a faster and more accurate digital screening approach.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<section class="container section-block">
+<div class="row g-4">
+<div class="col-lg-4">
+<div class="glass-card stat-card reveal h-100">
+<span class="section-label">Dataset</span>
+<h3>1092 Images</h3>
+<p class="mb-3">The dataset contains labeled apple leaf images for the main disease classes used in the project.</p>
+<div class="tag-group">
+{% for disease in disease_classes %}
+<span class="tag-chip">{{ disease }}</span>
+{% endfor %}
+</div>
+</div>
+</div>
+<div class="col-lg-8">
+<div class="section-card reveal h-100">
+<span class="section-label">Model Workflow</span>
+<h2>From image preprocessing to optimized KNN</h2>
+<ul class="workflow-list">
+{% for step in workflow_steps %}
+<li>{{ step }}</li>
+{% endfor %}
+</ul>
+<p class="workflow-note mb-0">Workflow summary based on the project documentation used for this website.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="container section-block">
+<div class="row g-4">
+<div class="col-lg-5">
+<div class="glass-card stat-card reveal h-100">
+<span class="section-label">Performance</span>
+<h3>Accuracy: ~82%</h3>
+<p class="mb-0">The trained model delivers solid baseline performance for apple disease recognition and demonstrates the value of ML-assisted crop monitoring.</p>
+</div>
+</div>
+<div class="col-lg-7">
+<div class="section-card reveal h-100">
+<span class="section-label">Tech Stack</span>
+<h2>Flask + OpenCV + Scikit-learn</h2>
+<p class="section-text mb-0">
+The web application is built with Flask for routing and templates, OpenCV for image preprocessing, and Scikit-learn for the KNN classification workflow and evaluation pipeline.
+</p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="container section-block">
+<div class="section-heading reveal">
+<span class="section-label">Team Members</span>
+<h2>Contributors behind the project</h2>
+</div>
+<div class="row g-4">
+{% for member in team_members %}
+<div class="col-md-4">
+<div class="glass-card team-card reveal">
+<div class="team-icon"><i class="fas {{ member.icon }}"></i></div>
+<h3>{{ member.name }}</h3>
+<p class="member-role">{{ member.role }}</p>
+</div>
+</div>
+{% endfor %}
+</div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
