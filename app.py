@@ -99,7 +99,7 @@ def predict_disease(img_path):
     if img is None:
         return "Invalid", INVALID_IMAGE_MESSAGE, "error"
 
-    img = cv2.resize(img, (96, 96))
+    img = cv2.resize(img, (64, 64))
     img = img / 255.0
     img = img.flatten().reshape(1, -1)
 

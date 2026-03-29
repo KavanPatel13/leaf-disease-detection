@@ -34,7 +34,7 @@ for label in classes:
             continue
 
         # âœ… Reduced size (less memory, faster)
-        image = cv2.resize(image, (96, 96))
+        image = cv2.resize(image, (64, 64))
 
         # âœ… Convert to float32 (IMPORTANT)
         image = image.astype("float32") / 255.0
