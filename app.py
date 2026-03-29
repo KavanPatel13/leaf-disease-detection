@@ -39,14 +39,14 @@ if not MODEL_PATH.exists():
 model = None
 label_encoder = None
 
-def load_model():
+def load_model_once():
     global model, label_encoder
 
     if model is None:
-        print("Loading model from file...")
+        print("Loading model once at startup...")
 
-        with MODEL_PATH.open("rb") as model_file:
-            saved_model = pickle.load(model_file)
+        with MODEL_PATH.open("rb") as f:
+            saved_model = pickle.load(f)
 
         if isinstance(saved_model, dict):
             model = saved_model["model"]
@@ -93,7 +93,7 @@ about_context = {
 
 
 def predict_disease(img_path):
-    load_model()  
+    load_model_once()  
     img = cv2.imread(img_path)
 
     if img is None:
