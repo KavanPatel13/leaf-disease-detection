@@ -27,15 +27,33 @@ if not MODEL_PATH.exists():
     print("Downloading model from HuggingFace...")
     urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
-with MODEL_PATH.open("rb") as model_file:
-    saved_model = pickle.load(model_file)
+# with MODEL_PATH.open("rb") as model_file:
+#     saved_model = pickle.load(model_file)
 
-if isinstance(saved_model, dict):
-    model = saved_model["model"]
-    label_encoder = saved_model.get("label_encoder")
-else:
-    model = saved_model
-    label_encoder = None
+# if isinstance(saved_model, dict):
+#     model = saved_model["model"]
+#     label_encoder = saved_model.get("label_encoder")
+# else:
+#     model = saved_model
+#     label_encoder = None
+model = None
+label_encoder = None
+
+def load_model():
+    global model, label_encoder
+
+    if model is None:
+        print("Loading model from file...")
+
+        with MODEL_PATH.open("rb") as model_file:
+            saved_model = pickle.load(model_file)
+
+        if isinstance(saved_model, dict):
+            model = saved_model["model"]
+            label_encoder = saved_model.get("label_encoder")
+        else:
+            model = saved_model
+            label_encoder = None
 
 disease_info = {
     "Black_rot": "Black rot is a fungal disease that causes dark lesions on apple leaves and fruit.",
@@ -75,6 +93,7 @@ about_context = {
 
 
 def predict_disease(img_path):
+    load_model()  
     img = cv2.imread(img_path)
 
     if img is None:
