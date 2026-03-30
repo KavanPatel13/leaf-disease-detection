@@ -15,4 +15,5 @@ gunicorn==21.2.0
 numpy==2.4.0
 opencv-python-headless==4.13.0.90
 scikit-learn==1.8.0
+scikit-image
 joblib==1.5.3

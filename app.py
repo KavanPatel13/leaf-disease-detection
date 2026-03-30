@@ -38,9 +38,11 @@ if not MODEL_PATH.exists():
 #     label_encoder = None
 model = None
 label_encoder = None
+pca = None
+image_size = (64, 64)
 
 def load_model_once():
-    global model, label_encoder
+    global model, label_encoder, pca, image_size
 
     if model is None:
         print("Loading model once at startup...")
@@ -51,9 +53,14 @@ def load_model_once():
         if isinstance(saved_model, dict):
             model = saved_model["model"]
             label_encoder = saved_model.get("label_encoder")
+            pca = saved_model.get("pca")
+            stored_image_size = saved_model.get("image_size")
+            if stored_image_size:
+                image_size = tuple(stored_image_size)
         else:
             model = saved_model
             label_encoder = None
+            pca = None
 
 disease_info = {
     "Black_rot": "Black rot is a fungal disease that causes dark lesions on apple leaves and fruit.",
@@ -85,7 +92,7 @@ about_context = {
         },
         {
             "name": "Mann Shah",
-            "role": "Testing & documentation",
+            "role": "Frontend, Testing & documentation",
             "icon": "fa-file-lines",
         },
     ],
@@ -99,11 +106,14 @@ def predict_disease(img_path):
     if img is None:
         return "Invalid", INVALID_IMAGE_MESSAGE, "error"
 
-    img = cv2.resize(img, (64, 64))
-    img = img / 255.0
-    img = img.flatten().reshape(1, -1)
+    img = cv2.resize(img, image_size)
+    img = img.astype("float32") / 255.0
+    img_features = img.flatten().reshape(1, -1)
 
-    prediction = model.predict(img)[0]
+    if pca is not None:
+        img_features = pca.transform(img_features).astype("float32")
+
+    prediction = model.predict(img_features)[0]
 
     if label_encoder is not None:
         prediction = label_encoder.inverse_transform([prediction])[0]
